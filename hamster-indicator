@@ -22,6 +22,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import gi
+gi.require_version('AppIndicator3', '0.1')
 from gi.repository import AppIndicator3 as appindicator
 from gi.repository import Gtk as gtk
 from gi.repository import Gdk as gdk
@@ -53,7 +55,7 @@ class HamsterIndicator(object):
     def __init__(self):
         self.storage = client.Storage()
         self.storage.connect("facts-changed", self.on_facts_changed, None)
-        self._settings = gio.Settings(self.BASE_SETTINGS_KEY)
+        self._settings = gio.Settings(schema=self.BASE_SETTINGS_KEY)
         self._settings.connect("changed", self.on_settings_changed, None)
         self._recent_activity_items = []
         self._create_indicator()
@@ -190,11 +192,11 @@ class HamsterIndicator(object):
 
         self.menu.append(gtk.SeparatorMenuItem())
 
-        tracking_settings_item = gtk.MenuItem(_(u"Tracking Settings"))
+        tracking_settings_item = gtk.MenuItem(label=_(u"Tracking Settings"))
         self.menu.append(tracking_settings_item)
         tracking_settings_item.connect("activate", self.on_show_settings, None)
 
-        indicator_options_item = gtk.MenuItem(_(u"Indicator Options"))
+        indicator_options_item = gtk.MenuItem(label=_(u"Indicator Options"))
         self.menu.append(indicator_options_item)
         indicator_options_item.connect("activate", self.on_show_options, None)
 
@@ -214,10 +216,10 @@ class HamsterIndicator(object):
         # Set icons according to settings
         if self._get_setting("change-icon-when-active"):
             # TODO: this icon needs some love
-            self.indicator.set_attention_icon('hamster-indicator-active')
+            self.indicator.set_attention_icon_full('hamster-indicator-active', 'hamster-indicator-active')
         else:
             # just use the same icon
-            self.indicator.set_attention_icon('hamster-indicator-inactive')
+            self.indicator.set_attention_icon('hamster-indicator-inactive', 'hamster-indicator-inactive')
     
     def _update_quit_menu_item(self):
         if self._get_setting("stop-on-quit") and self._facts and \
